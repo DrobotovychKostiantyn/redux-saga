@@ -1,4 +1,4 @@
-import {takeLatest, put, all, call} from 'redux-saga/effects';
+import {takeLatest, put, all, takeEvery, select} from 'redux-saga/effects';
 const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
 function* ageUpAsync() {
@@ -29,7 +29,16 @@ export function* watchAgeDown() {
   yield takeLatest('AGE_DOWN', fetchData)
 }
 
+function* logger(action) {
+  const state = yield select()
 
+  console.log('action', action)
+  console.log('state after', state)
+}
+
+function* watchAndLog() {
+  yield takeEvery('*', logger)
+}
 
 export function* fetchData(action) {
   try {
@@ -54,5 +63,6 @@ export function* rootSaga() {
     watchAgeUp(),
     watchAgeDown(),
     watchFetchData(),
+    watchAndLog(),
   ])
 }
