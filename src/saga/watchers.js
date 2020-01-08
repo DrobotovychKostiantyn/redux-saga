@@ -1,5 +1,5 @@
-import {fetchData, ageUpAsync, ageDownAsync} from "./saga";
-import {takeLatest, all } from 'redux-saga/effects';
+import {fetchData, ageUpAsync, ageDownAsync, logger} from "./saga";
+import {takeLatest, all, takeEvery } from 'redux-saga/effects';
 import {actionTypes} from "../store/actions";
 
 export function* watchAgeUp() {
@@ -14,16 +14,15 @@ function* watchFetchData() {
   yield takeLatest(actionTypes.FETCH_PLACEHOLDER_REQUEST, fetchData);
 }
 
-// function* watchAndLog() {
-//   yield takeEvery('*', logger)
-// }
-
+function* watchAndLog() {
+  yield takeEvery('*', logger)
+}
 
 export function* rootSaga() {
   yield all([
     watchAgeUp(),
     watchAgeDown(),
     watchFetchData(),
-    // watchAndLog(),
+    watchAndLog(),
   ])
 }
