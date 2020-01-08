@@ -1,68 +1,45 @@
-import {takeLatest, put, all, takeEvery, select} from 'redux-saga/effects';
+import { put, take, select, takeEvery } from 'redux-saga/effects';
+import {successPlaceholder, errorPlaceholder, actionTypes} from "../store/actions";
+
 const delay = (ms) => new Promise(res => setTimeout(res, ms));
-
-function* ageUpAsync() {
-  console.log("up");
-  yield delay(1000);
+const DELAY = 1000;
+export function* ageUpAsync(action) {
+  yield delay(DELAY);
   yield put({
-    type: 'AGE_UP_ASYNC',
+    type: actionTypes.AGE_UP_ASYNC,
     payload: 1,
   })
 }
 
-export function* watchAgeUp() {
-  yield takeLatest('AGE_UP', ageUpAsync)
-}
-
-function* ageDownAsync() {
-  console.log("down");
-  yield delay(1000);
+export function* ageDownAsync(action) {
+  yield delay(DELAY);
 
   yield put({
-    type: 'AGE_DOWN_ASYNC',
+    type: actionTypes.AGE_DOWN_ASYNC,
     payload: 1,
   })
 }
 
-export function* watchAgeDown() {
-  console.log('1');
-  yield takeLatest('AGE_DOWN', fetchData)
-}
+export function* logger(action) {
+  while (true) {
+    const action = yield take('*');
+    const state = yield select()
 
-function* logger(action) {
-  const state = yield select()
-
-  console.log('action', action)
-  console.log('state after', state)
-}
-
-function* watchAndLog() {
-  yield takeEvery('*', logger)
+    console.log('action', action)
+    console.log('state after', state)
+  }
 }
 
 export function* fetchData(action) {
   try {
-
     const response = yield fetch('https://jsonplaceholder.typicode.com/todos');
-    // yield put({type: "FETCH_SUCCEEDED", data})
-
     const data = yield response.json();
-    yield console.log(data)
+
+    yield put(successPlaceholder(data));
   } catch (error) {
-    // yield put({type: "FETCH_FAILED", error})
-    yield console.log({type: "FETCH_FAILED", error});
+    yield put(errorPlaceholder(error));
   }
 }
 
-function* watchFetchData() {
-  yield takeLatest('FETCH_REQUESTED', fetchData);
-}
 
-export function* rootSaga() {
-  yield all([
-    watchAgeUp(),
-    watchAgeDown(),
-    watchFetchData(),
-    watchAndLog(),
-  ])
-}
+
